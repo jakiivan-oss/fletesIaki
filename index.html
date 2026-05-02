@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fletes Santiago Rozman - Lanús</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h2 { color: #1a73e8; text-align: center; margin-bottom: 5px; font-size: 1.5rem; }
+        .contacto-header { text-align: center; font-size: 0.9rem; color: #333; font-weight: bold; margin-bottom: 15px; }
+        .info { font-size: 0.85rem; color: #666; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; color: #444; }
+        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #eef2f7; border-radius: 12px; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s; }
+        input:focus { border-color: #1a73e8; }
+        
+        .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; background: #fffbe6; padding: 12px; border-radius: 12px; border: 1px solid #ffe58f; }
+        .toggle-container label { margin: 0; cursor: pointer; font-size: 0.9rem; color: #856404; }
+        .switch { width: 22px; height: 22px; cursor: pointer; }
+
+        .btn-group { display: flex; gap: 12px; margin-top: 25px; }
+        button { flex: 2; background-color: #1a73e8; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .btn-reset { flex: 1; background-color: #f1f3f4; color: #5f6368; }
+        button:active { transform: scale(0.96); }
+        
+        #resultado { margin-top: 25px; padding: 20px; border-radius: 15px; text-align: center; display: none; background-color: #e8f0fe; border: 1px solid #d2e3fc; }
+        .precio { font-size: 2.2rem; font-weight: 800; color: #174ea6; margin-top: 5px; }
+        .detalle-texto { font-size: 0.8rem; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-copy { background-color: #34a853; margin-top: 15px; width: 100%; }
+        .hidden { display: none; }
+        .footer-contacto { margin-top: 25px; text-align: center; font-size: 0.85rem; color: #777; border-top: 1px solid #eee; padding-top: 15px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Calculadora de Fletes</h2>
+    <div class="contacto-header">Santiago Ivan Rozman</div>
+    <p class="info">📍 Base: Int. Manuel Quindimil 741, Lanús</p>
+
+    <label for="distancia">Distancia a recorrer (km):</label>
+    <input type="number" id="distancia" placeholder="Ej: 18" min="0">
+
+    <label for="region">Región de Destino:</label>
+    <select id="region" onchange="toggleBarrios()">
+        <option value="gba">Gran Buenos Aires (GBA)</option>
+        <option value="caba">Capital Federal (CABA)</option>
+    </select>
+
+    <div id="div-barrios" class="hidden">
+        <label for="tipo_zona">Barrio / Tipo de Zona:</label>
+        <select id="tipo_zona">
+            <optgroup label="Zona Difícil">
+                <option value="dificil">Microcentro / Once / Congreso</option>
+                <option value="dificil">Recoleta / Retiro / San Telmo</option>
+                <option value="dificil">Palermo / Belgrano / Villa Crespo</option>
+                <option value="dificil">Caballito / Almagro / Flores</option>
+                <option value="dificil">Puerto Madero / Zona de Ciclovías</option>
+            </optgroup>
+            <optgroup label="Zona Fácil">
+                <option value="facil">Villa Devoto / Liniers / Mataderos</option>
+                <option value="facil">Saavedra / Villa Urquiza / Coghlan</option>
+                <option value="facil">Parque Patricios / Pompeya / Barracas</option>
+                <option value="facil">Villa Lugano / Soldati / Riachuelo</option>
+                <option value="facil">Monte Castro / Versalles / Villa Real</option>
+                <option value="facil">Otros barrios residenciales</option>
+            </optgroup>
+        </select>
+    </div>
+
+    <div class="toggle-container">
+        <label for="ruta_rapida">🚚 ¿Ruta Rápida? (Peaje)</label>
+        <input type="checkbox" id="ruta_rapida" class="switch">
+    </div>
+
+    <div class="btn-group">
+        <button class="btn-reset" onclick="reiniciar()">BORRAR</button>
+        <button onclick="calcularFlete()">CALCULAR</button>
+    </div>
+
+    <div id="resultado">
+        <span class="detalle-texto" id="detalle"></span>
+        <div class="precio" id="monto"></div>
+        <button class="btn-copy" onclick="copiarPresupuesto()">COPIAR PRESUPUESTO</button>
+    </div>
+
+    <div class="footer-contacto">
+        📞 WhatsApp: 11 7136-7889
+    </div>
+</div>
+
+<script>
+    const PRECIO_KM = 1500; 
+    const BASE_CABA_FACIL = 3000;
+    const BASE_CABA_DIFICIL = 5000;
+    const COSTO_PEAJE = 3000;
+
+    function toggleBarrios() {
+        const region = document.getElementById('region').value;
+        const divBarrios = document.getElementById('div-barrios');
+        divBarrios.classList.toggle('hidden', region !== 'caba');
+    }
+
+    function calcularFlete() {
+        const km = parseFloat(document.getElementById('distancia').value);
+        const region = document.getElementById('region').value;
+        const tipoCaba = document.getElementById('tipo_zona').value;
+        const rutaRapida = document.getElementById('ruta_rapida').checked;
+        const resDiv = document.getElementById('resultado');
+        const montoDiv = document.getElementById('monto');
+        const detalleDiv = document.getElementById('detalle');
+
+        if (isNaN(km) || km < 0) {
+            alert("Por favor, ingresa los kilómetros.");
+            return;
+        }
+
+        let total = 0;
+        let desc = "";
+
+        if (region === "gba") {
+            if (km <= 10) {
+                total = 0;
+                desc = "GBA - Bonificado";
+            } else {
+                total = (km - 10) * PRECIO_KM;
+                desc = `GBA - ${(km-10)} km excedentes`;
+            }
+        } else {
+            if (km <= 6) {
+                total = 0;
+                desc = "CABA - Bonificado (Menos de 6km)";
+            } else {
+                const excedente = km - 6;
+                if (tipoCaba === "facil") {
+                    total = BASE_CABA_FACIL + (excedente * PRECIO_KM);
+                    desc = `CABA Fácil - Base $${BASE_CABA_FACIL.toLocaleString()} + ${excedente} km`;
+                } else {
+                    total = BASE_CABA_DIFICIL + (excedente * PRECIO_KM);
+                    desc = `CABA Difícil - Base $${BASE_CABA_DIFICIL.toLocaleString()} + ${excedente} km`;
+                }
+            }
+        }
+
+        if (rutaRapida && total > 0) {
+            total += COSTO_PEAJE;
+            desc += " + Peaje";
+        }
+
+        resDiv.style.display = "block";
+        detalleDiv.innerText = desc;
+        montoDiv.innerText = "$" + total.toLocaleString('es-AR');
+    }
+
+    function copiarPresupuesto() {
+        const desc = document.getElementById('detalle').innerText;
+        const monto = document.getElementById('monto').innerText;
+        const texto = `*Presupuesto de Flete - Santiago Rozman*\n📍 Base: Lanús\n🚚 Detalle: ${desc}\n💰 *Total: ${monto}*\n\n📞 WhatsApp: 1171367889`;
+        
+        navigator.clipboard.writeText(texto).then(() => {
+            alert("¡Presupuesto copiado!");
+        });
+    }
+
+    function reiniciar() {
+        document.getElementById('distancia').value = "";
+        document.getElementById('region').selectedIndex = 0;
+        document.getElementById('ruta_rapida').checked = false;
+        document.getElementById('div-barrios').classList.add('hidden');
+        document.getElementById('resultado').style.display = "none";
+    }
+</script>
+
+</body>
+</html>
+
