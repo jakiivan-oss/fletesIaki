@@ -2,23 +2,9 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fletes Iaki - Calculadora</title>
-
-  <link rel="icon" type="image/png" href="logo.png" />
-  <link rel="apple-touch-icon" href="logo.png" />
-  <meta name="theme-color" content="#FF6600" />
-
-  <!-- Manifest para PWA -->
-  <link rel="manifest" href="manifest.json" />
-
-  <style>
-    /* (Aquí va todo el CSS que te pasé antes, por brevedad no lo repito) */
-    /* Puedes copiar el CSS del código anterior aquí */
-  </style>
- <!-- Enlace al archivo CSS externo -->
   <link rel="stylesheet" href="estilo.css" />
-
 </head>
 <body>
   <main class="card" role="main" aria-label="Calculadora de fletes">
@@ -80,7 +66,6 @@
   </main>
 
   <script>
-    // Mostrar u ocultar barrios según región seleccionada
     function toggleBarrios() {
       const regionSelect = document.getElementById('region');
       const barriosDiv = document.getElementById('div-barrios');
@@ -90,7 +75,6 @@
       regionSelect.setAttribute('aria-expanded', expanded);
     }
 
-    // Reiniciar formulario
     function reiniciar() {
       document.getElementById('distancia').value = '';
       document.getElementById('region').value = 'gba';
@@ -101,7 +85,6 @@
       document.getElementById('error-distancia').style.display = 'none';
     }
 
-    // Validar y calcular flete (ejemplo simple)
     function calcularFlete() {
       const distanciaInput = document.getElementById('distancia');
       const errorDistancia = document.getElementById('error-distancia');
@@ -121,15 +104,35 @@
       const tipoZona = document.getElementById('tipo_zona').value;
       const rutaRapida = document.getElementById('ruta_rapida').checked;
 
-      let basePrice = 100;
-      let distancePrice = distancia * 10;
-      let zoneMultiplier = tipoZona === 'dificil' ? 1.3 : 1.0;
-      let tollFee = rutaRapida ? 50 : 0;
+      let total = 0;
 
-      let total = (basePrice + distancePrice) * zoneMultiplier + tollFee;
+      if (region === 'gba') {
+        // Gran Buenos Aires
+        if (distancia <= 10) {
+          total = 0; // gratis hasta 10 km
+        } else {
+          const kmExtra = distancia - 10;
+          total = kmExtra * 1500;
+        }
+      } else if (region === 'caba' && tipoZona === 'dificil') {
+        // Capital Federal - Zona difícil
+        if (distancia < 6) {
+          total = 0; // gratis o costo base si quieres ajustar
+        } else {
+          const kmExtra = distancia - 6;
+          total = 6000 + (kmExtra > 0 ? kmExtra * 1600 : 0);
+        }
+      } else {
+        // Otras zonas (CABA fácil u otras)
+        let basePrice = 100;
+        let distancePrice = distancia * 10;
+        let zoneMultiplier = tipoZona === 'dificil' ? 1.3 : 1.0;
+        let tollFee = rutaRapida ? 50 : 0;
+        total = (basePrice + distancePrice) * zoneMultiplier + tollFee;
+      }
 
       resultado.innerHTML = `
-        <div class="precio">$${total.toFixed(2)}</div>
+        <div class="precio">${total === 0 ? 'Gratis' : '$' + total.toFixed(2)}</div>
         <span class="detalle-texto">Distancia: ${distancia} km</span>
         <span class="detalle-texto">Región: ${region.toUpperCase()}</span>
         <span class="detalle-texto">Zona: ${tipoZona === 'dificil' ? 'Difícil' : 'Fácil'}</span>
@@ -139,21 +142,9 @@
       resultado.focus();
     }
 
-    // Inicializar estado
     document.addEventListener('DOMContentLoaded', () => {
       toggleBarrios();
     });
-
-    // Registrar service worker para PWA
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(registration => {
-          console.log('Service Worker registrado con éxito:', registration.scope);
-        }).catch(error => {
-          console.log('Error al registrar Service Worker:', error);
-        });
-      });
-    }
   </script>
 </body>
 </html>
