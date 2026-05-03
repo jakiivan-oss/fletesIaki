@@ -13,16 +13,41 @@
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; display: flex; justify-content: center; padding: 20px; color: #eee; }
         .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 450px; border-top: 10px solid #FF6600; color: #333; }
-        h2 { color: #333; text-align: center; margin-bottom: 5px; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px; }
+        h2 { color: #333; text-align: center; margin-bottom: 5px; font-size: 1.5rem; font-weight: 900; letter-spacing: -1px; }
         .contacto-header { text-align: center; font-size: 1.1rem; color: #FF6600; font-weight: 800; margin-bottom: 15px; }
         .info { font-size: 0.85rem; color: #777; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         
         label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; color: #444; }
-        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 2px solid #eef2f7; border-radius: 12px; box-sizing: border-box; font-size: 1rem; outline: none; background: #f9f9f9; }
+        
+        /* CORRECCIÓN DE TAMAÑO DE LETRA EN MENÚS */
+        input, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 8px; 
+            border: 2px solid #eef2f7; 
+            border-radius: 12px; 
+            box-sizing: border-box; 
+            font-size: 0.9rem; /* Letra un poco más chica */
+            outline: none; 
+            background: #f9f9f9; 
+            appearance: none; /* Quita estilos raros de algunos sistemas */
+        }
+        
+        /* Estilo específico para las opciones del menú */
+        select option {
+            font-size: 0.85rem;
+        }
+
+        optgroup {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #FF6600;
+        }
+
         input:focus { border-color: #FF6600; background: #fff; }
         
         .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; background: #fff5eb; padding: 14px; border-radius: 12px; border: 1px solid #ffd8b3; }
-        .toggle-container label { margin: 0; cursor: pointer; font-size: 0.95rem; color: #c24e00; font-weight: bold; }
+        .toggle-container label { margin: 0; cursor: pointer; font-size: 0.9rem; color: #c24e00; font-weight: bold; }
         .switch { width: 24px; height: 24px; cursor: pointer; accent-color: #FF6600; }
 
         .btn-group { display: flex; gap: 12px; margin-top: 25px; }
@@ -105,7 +130,6 @@
 </div>
 
 <script>
-    // PRECIOS FINALES SEGÚN TUS PEDIDOS
     const PRECIO_KM = 1500; 
     const BASE_CABA_FACIL = 3000;
     const BASE_CABA_DIFICIL = 5000;
@@ -143,7 +167,6 @@
                 desc = `GBA - ${(km-10)} KM EXCEDENTES`;
             }
         } else {
-            // Lógica CABA (6km gratis para ambas zonas)
             if (km <= 6) {
                 total = 0;
                 desc = "CABA - COSTO BONIFICADO";
@@ -175,7 +198,7 @@
         const texto = `*FLETES IAKI*\n_Santiago Rozman - 1171367889_\n\n📍 Origen: Lanús\n🚚 Detalle: ${desc}\n💰 *TOTAL: ${monto}*`;
         
         navigator.clipboard.writeText(texto).then(() => {
-            alert("¡Presupuesto copiado al portapapeles!");
+            alert("¡Presupuesto copiado!");
         });
     }
 
@@ -190,4 +213,3 @@
 
 </body>
 </html>
-
