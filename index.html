@@ -4,13 +4,109 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fletes Iaki - Calculadora</title>
-  <link rel="stylesheet" href="estilo.css" />
+  <style>
+    /* Estilos básicos para diseño responsivo y limpio */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #171717;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    main {
+      background: #fff;
+      color: #222;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 900;
+      font-size: 1.5rem;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    .error-msg {
+      color: #b3261e;
+      font-weight: 700;
+      margin-top: 4px;
+      display: none;
+    }
+    .toggle-container {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #ff6600;
+      color: white;
+      width: 48%;
+    }
+    button.btn-reset {
+      background-color: #ccc;
+      color: #333;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    #resultado {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 1.3rem;
+      color: #ff6600;
+    }
+    .detalle-texto {
+      display: block;
+      font-weight: 400;
+      font-size: 0.9rem;
+      margin-top: 4px;
+      color: #444;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
 <body>
-  <main class="card" role="main" aria-label="Calculadora de fletes">
+  <main role="main" aria-label="Calculadora de fletes">
     <h2>CALCULADORA</h2>
-    <div class="contacto-header" aria-hidden="true">FLETES IAKI</div>
-    <p class="info" aria-live="polite">📍 Base: Int. Manuel Quindimil 741, Lanús</p>
+    <div aria-hidden="true" style="font-weight: 700; margin-bottom: 8px;">FLETES IAKI</div>
+    <p aria-live="polite" style="margin-bottom: 15px;">📍 Base: Int. Manuel Quindimil 741, Lanús</p>
 
     <label for="distancia">Distancia (km):</label>
     <input
@@ -114,16 +210,28 @@
           const kmExtra = distancia - 10;
           total = kmExtra * 1500;
         }
-      } else if (region === 'caba' && tipoZona === 'dificil') {
-        // Capital Federal - Zona difícil
-        if (distancia < 6) {
-          total = 0; // gratis o costo base si quieres ajustar
+      } else if (region === 'caba') {
+        if (tipoZona === 'facil') {
+          // CABA zona fácil
+          if (distancia <= 8) {
+            total = 0; // gratis hasta 8 km
+          } else {
+            const kmExtra = distancia - 8;
+            total = 5000 + kmExtra * 1500;
+          }
+        } else if (tipoZona === 'dificil') {
+          // CABA zona difícil
+          if (distancia <= 5) {
+            total = 0; // gratis hasta 5 km
+          } else {
+            const kmExtra = distancia - 5;
+            total = 8000 + kmExtra * 2000;
+          }
         } else {
-          const kmExtra = distancia - 6;
-          total = 6000 + (kmExtra > 0 ? kmExtra * 1600 : 0);
+          total = 0;
         }
       } else {
-        // Otras zonas (CABA fácil u otras)
+        // Otras zonas
         let basePrice = 100;
         let distancePrice = distancia * 10;
         let zoneMultiplier = tipoZona === 'dificil' ? 1.3 : 1.0;
