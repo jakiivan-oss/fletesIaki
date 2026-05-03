@@ -3,43 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fletes Santiago Rozman - Lanús</title>
+    <title>Fletes Iaki - Calculadora</title>
+    
+    <!-- Configuración para el Logo en el Celular -->
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.png">
+    <meta name="theme-color" content="#FF6600">
+
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
-        h2 { color: #1a73e8; text-align: center; margin-bottom: 5px; font-size: 1.5rem; }
-        .contacto-header { text-align: center; font-size: 0.9rem; color: #333; font-weight: bold; margin-bottom: 15px; }
-        .info { font-size: 0.85rem; color: #666; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; color: #444; }
-        input, select { width: 100%; padding: 12px; margin-top: 8px; border: 2px solid #eef2f7; border-radius: 12px; box-sizing: border-box; font-size: 1rem; outline: none; transition: 0.3s; }
-        input:focus { border-color: #1a73e8; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1a1a1a; display: flex; justify-content: center; padding: 20px; color: #eee; }
+        .card { background: white; padding: 25px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 100%; max-width: 450px; border-top: 10px solid #FF6600; color: #333; }
+        h2 { color: #333; text-align: center; margin-bottom: 5px; font-size: 1.6rem; font-weight: 900; letter-spacing: -1px; }
+        .contacto-header { text-align: center; font-size: 1.1rem; color: #FF6600; font-weight: 800; margin-bottom: 15px; }
+        .info { font-size: 0.85rem; color: #777; margin-bottom: 20px; text-align: center; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         
-        .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; background: #fffbe6; padding: 12px; border-radius: 12px; border: 1px solid #ffe58f; }
-        .toggle-container label { margin: 0; cursor: pointer; font-size: 0.9rem; color: #856404; }
-        .switch { width: 22px; height: 22px; cursor: pointer; }
+        label { display: block; margin-top: 15px; font-weight: bold; font-size: 0.9rem; color: #444; }
+        input, select { width: 100%; padding: 14px; margin-top: 8px; border: 2px solid #eef2f7; border-radius: 12px; box-sizing: border-box; font-size: 1rem; outline: none; background: #f9f9f9; }
+        input:focus { border-color: #FF6600; background: #fff; }
+        
+        .toggle-container { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; background: #fff5eb; padding: 14px; border-radius: 12px; border: 1px solid #ffd8b3; }
+        .toggle-container label { margin: 0; cursor: pointer; font-size: 0.95rem; color: #c24e00; font-weight: bold; }
+        .switch { width: 24px; height: 24px; cursor: pointer; accent-color: #FF6600; }
 
         .btn-group { display: flex; gap: 12px; margin-top: 25px; }
-        button { flex: 2; background-color: #1a73e8; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 1rem; transition: 0.2s; }
-        .btn-reset { flex: 1; background-color: #f1f3f4; color: #5f6368; }
-        button:active { transform: scale(0.96); }
+        button { flex: 2; background-color: #FF6600; color: white; border: none; padding: 16px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 1rem; transition: 0.2s; text-transform: uppercase; box-shadow: 0 4px 0 #cc5200; }
+        .btn-reset { flex: 1; background-color: #f1f3f4; color: #5f6368; box-shadow: 0 4px 0 #d1d3d4; }
         
-        #resultado { margin-top: 25px; padding: 20px; border-radius: 15px; text-align: center; display: none; background-color: #e8f0fe; border: 1px solid #d2e3fc; }
-        .precio { font-size: 2.2rem; font-weight: 800; color: #174ea6; margin-top: 5px; }
-        .detalle-texto { font-size: 0.8rem; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-copy { background-color: #34a853; margin-top: 15px; width: 100%; }
+        button:active { transform: translateY(2px); box-shadow: 0 2px 0 #cc5200; }
+        .btn-reset:active { box-shadow: 0 2px 0 #d1d3d4; }
+        
+        #resultado { margin-top: 25px; padding: 20px; border-radius: 15px; text-align: center; display: none; background-color: #333; color: white; border: 2px solid #FF6600; animation: fadeIn 0.4s ease; }
+        .precio { font-size: 2.8rem; font-weight: 900; color: #FF6600; margin: 10px 0; }
+        .detalle-texto { font-size: 0.85rem; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-copy { background-color: #28a745; margin-top: 15px; width: 100%; box-shadow: 0 4px 0 #1e7e34; }
+        .btn-copy:active { box-shadow: 0 2px 0 #1e7e34; }
+        
+        .footer-contacto { margin-top: 25px; text-align: center; font-size: 0.9rem; color: #666; border-top: 1px solid #eee; padding-top: 15px; font-weight: bold; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .hidden { display: none; }
-        .footer-contacto { margin-top: 25px; text-align: center; font-size: 0.85rem; color: #777; border-top: 1px solid #eee; padding-top: 15px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <h2>Calculadora de Fletes</h2>
-    <div class="contacto-header">Santiago Ivan Rozman</div>
+    <h2>CALCULADORA</h2>
+    <div class="contacto-header">FLETES IAKI</div>
     <p class="info">📍 Base: Int. Manuel Quindimil 741, Lanús</p>
 
     <label for="distancia">Distancia a recorrer (km):</label>
-    <input type="number" id="distancia" placeholder="Ej: 18" min="0">
+    <input type="number" id="distancia" placeholder="Ingresa los km" min="0">
 
     <label for="region">Región de Destino:</label>
     <select id="region" onchange="toggleBarrios()">
@@ -48,21 +61,23 @@
     </select>
 
     <div id="div-barrios" class="hidden">
-        <label for="tipo_zona">Barrio / Tipo de Zona:</label>
+        <label for="tipo_zona">Barrio / Zona:</label>
         <select id="tipo_zona">
-            <optgroup label="Zona Difícil">
+            <optgroup label="Zonas Difíciles">
                 <option value="dificil">Microcentro / Once / Congreso</option>
                 <option value="dificil">Recoleta / Retiro / San Telmo</option>
                 <option value="dificil">Palermo / Belgrano / Villa Crespo</option>
                 <option value="dificil">Caballito / Almagro / Flores</option>
                 <option value="dificil">Puerto Madero / Zona de Ciclovías</option>
+                <option value="dificil">Chacarita / Paternal / Villa del Parque</option>
             </optgroup>
-            <optgroup label="Zona Fácil">
+            <optgroup label="Zonas Fáciles">
                 <option value="facil">Villa Devoto / Liniers / Mataderos</option>
                 <option value="facil">Saavedra / Villa Urquiza / Coghlan</option>
                 <option value="facil">Parque Patricios / Pompeya / Barracas</option>
                 <option value="facil">Villa Lugano / Soldati / Riachuelo</option>
                 <option value="facil">Monte Castro / Versalles / Villa Real</option>
+                <option value="facil">Agronomía / Villa Pueyrredón / Villa Ortúzar</option>
                 <option value="facil">Otros barrios residenciales</option>
             </optgroup>
         </select>
@@ -81,15 +96,16 @@
     <div id="resultado">
         <span class="detalle-texto" id="detalle"></span>
         <div class="precio" id="monto"></div>
-        <button class="btn-copy" onclick="copiarPresupuesto()">COPIAR PRESUPUESTO</button>
+        <button class="btn-copy" onclick="copiarPresupuesto()">COPIAR Y ENVIAR</button>
     </div>
 
     <div class="footer-contacto">
-        📞 WhatsApp: 11 7136-7889
+        Santiago Ivan Rozman | 📞 11 7136-7889
     </div>
 </div>
 
 <script>
+    // PRECIOS FINALES SEGÚN TUS PEDIDOS
     const PRECIO_KM = 1500; 
     const BASE_CABA_FACIL = 3000;
     const BASE_CABA_DIFICIL = 5000;
@@ -111,7 +127,7 @@
         const detalleDiv = document.getElementById('detalle');
 
         if (isNaN(km) || km < 0) {
-            alert("Por favor, ingresa los kilómetros.");
+            alert("Por favor, ingresa los kilómetros del viaje.");
             return;
         }
 
@@ -121,15 +137,16 @@
         if (region === "gba") {
             if (km <= 10) {
                 total = 0;
-                desc = "GBA - Bonificado";
+                desc = "GBA - COSTO BONIFICADO";
             } else {
                 total = (km - 10) * PRECIO_KM;
-                desc = `GBA - ${(km-10)} km excedentes`;
+                desc = `GBA - ${(km-10)} KM EXCEDENTES`;
             }
         } else {
+            // Lógica CABA (6km gratis para ambas zonas)
             if (km <= 6) {
                 total = 0;
-                desc = "CABA - Bonificado (Menos de 6km)";
+                desc = "CABA - COSTO BONIFICADO";
             } else {
                 const excedente = km - 6;
                 if (tipoCaba === "facil") {
@@ -155,10 +172,10 @@
     function copiarPresupuesto() {
         const desc = document.getElementById('detalle').innerText;
         const monto = document.getElementById('monto').innerText;
-        const texto = `*Presupuesto de Flete - Santiago Rozman*\n📍 Base: Lanús\n🚚 Detalle: ${desc}\n💰 *Total: ${monto}*\n\n📞 WhatsApp: 1171367889`;
+        const texto = `*FLETES IAKI*\n_Santiago Rozman - 1171367889_\n\n📍 Origen: Lanús\n🚚 Detalle: ${desc}\n💰 *TOTAL: ${monto}*`;
         
         navigator.clipboard.writeText(texto).then(() => {
-            alert("¡Presupuesto copiado!");
+            alert("¡Presupuesto copiado al portapapeles!");
         });
     }
 
