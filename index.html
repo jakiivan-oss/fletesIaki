@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Fletes Iaki - Calculadora</title>
-  <link rel="icon" type="image/png" href="icon.png" />
   <meta name="theme-color" content="#111111" />
+  <meta name="description" content="Calculadora de fletes para Fletes Iaki" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icon.png" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,11 +22,9 @@
       --line:rgba(0,0,0,.12);
       --accent:#ff6a00;
       --accent-2:#ff8e3c;
-      --soft:#ece7df;
       --ok:#0f9d58;
       --danger:#c62828;
       --shadow:0 20px 60px rgba(0,0,0,.28);
-      --radius:28px;
     }
 
     *{box-sizing:border-box}
@@ -39,7 +39,7 @@
       color:var(--text);
       background:
         radial-gradient(circle at top left, rgba(255,106,0,.12), transparent 25%),
-        radial-gradient(circle at bottom right, rgba(255,255,255,.05), transparent 20%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,.04), transparent 20%),
         var(--bg);
       min-height:100vh;
       min-height:100dvh;
@@ -172,9 +172,7 @@
       transform:translateY(-1px);
     }
 
-    .hidden{
-      display:none;
-    }
+    .hidden{display:none}
 
     .error-msg{
       display:none;
@@ -349,7 +347,7 @@
           type="number"
           id="distancia"
           name="distancia"
-          placeholder="Ej: 10"
+          placeholder="Ej: 13"
           min="0"
           step="0.1"
           inputmode="decimal"
@@ -396,118 +394,136 @@
         <button type="button" class="btn-main" id="btnCalcular">Calcular</button>
       </div>
 
-      <section id="resultado" class="result" aria-live="polite" aria-atomic="true">
-        <div class="meta">Completá la distancia y elegí la región para calcular.</div>
+      <section class="result" aria-live="polite" aria-atomic="true">
+        <h2 id="resultadoPrecio" class="price">—</h2>
+        <div class="meta" id="resultadoMeta">
+          <span>Ingresá una distancia para calcular.</span>
+        </div>
       </section>
     </div>
   </main>
 
   <script>
-    const region = document.getElementById('region');
+    const distanciaInput = document.getElementById('distancia');
+    const regionSelect = document.getElementById('region');
     const campoBarrios = document.getElementById('campo-barrios');
     const tipoZona = document.getElementById('tipo_zona');
-    const distancia = document.getElementById('distancia');
     const rutaRapida = document.getElementById('ruta_rapida');
-    const resultado = document.getElementById('resultado');
-    const errorDistancia = document.getElementById('error-distancia');
     const btnCalcular = document.getElementById('btnCalcular');
     const btnBorrar = document.getElementById('btnBorrar');
+    const errorDistancia = document.getElementById('error-distancia');
+    const resultadoPrecio = document.getElementById('resultadoPrecio');
+    const resultadoMeta = document.getElementById('resultadoMeta');
 
-    function toggleBarrios() {
-      const esCaba = region.value === 'caba';
+    function formatearPrecio(valor){
+      return '$' + Math.round(valor).toLocaleString('es-AR');
+    }
+
+    function mostrarError(mostrar){
+      errorDistancia.style.display = mostrar ? 'block' : 'none';
+      distanciaInput.setAttribute('aria-invalid', mostrar ? 'true' : 'false');
+    }
+
+    function actualizarRegion(){
+      const esCaba = regionSelect.value === 'caba';
       campoBarrios.classList.toggle('hidden', !esCaba);
     }
 
-    function formatearPesos(valor) {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: 'ARS',
-        maximumFractionDigits: 0
-      }).format(valor);
-    }
+    function calcularFlete(){
+      const distancia = parseFloat(distanciaInput.value);
 
-    function reiniciar() {
-      distancia.value = '';
-      region.value = 'gba';
-      tipoZona.selectedIndex = 0;
-      rutaRapida.checked = false;
-      errorDistancia.style.display = 'none';
-      toggleBarrios();
-      resultado.innerHTML = '<div class="meta">Completá la distancia y elegí la región para calcular.</div>';
-    }
-
-    function calcularFlete() {
-      const km = parseFloat(distancia.value);
-
-      if (isNaN(km) || km < 0) {
-        errorDistancia.style.display = 'block';
-        resultado.innerHTML = '';
-        distancia.focus();
+      if (isNaN(distancia) || distancia <= 0){
+        mostrarError(true);
+        resultadoPrecio.textContent = '—';
+        resultadoPrecio.className = 'price';
+        resultadoMeta.innerHTML = '<span>Ingresá una distancia válida para calcular.</span>';
         return;
       }
 
-      errorDistancia.style.display = 'none';
+      mostrarError(false);
 
-      let total = 0;
-      let detalleTarifa = '';
+      let precio = 0;
+      let detalle = [];
+      let tipoViaje = '';
+      let ajuste = '';
 
-      if (region.value === 'gba') {
-        if (km <= 10) {
-          total = 0;
-          detalleTarifa = 'GBA: hasta 10 km gratis.';
-        } else {
-          total = (km - 10) * 1500;
-          detalleTarifa = 'GBA: después de 10 km, $1500 por km.';
+      if (regionSelect.value === 'gba') {
+        // Ajustado para que 13 km = $15.000
+        // Fórmula: base + km * tarifa
+        // 7000 + (13 * 615.38) = aprox 15000
+        const baseGBA = 7000;
+        const tarifaKmGBA = 615.38;
+
+        precio = baseGBA + (distancia * tarifaKmGBA);
+        tipoViaje = 'Gran Buenos Aires';
+
+        detalle.push(`Base GBA: ${formatearPrecio(baseGBA)}`);
+        detalle.push(`Distancia: ${distancia} km × ${formatearPrecio(tarifaKmGBA)}`);
+
+        if (rutaRapida.checked) {
+          const peajeGBA = 1800;
+          precio += peajeGBA;
+          ajuste = `Incluye ruta rápida / peaje: ${formatearPrecio(peajeGBA)}`;
         }
-      } else if (region.value === 'caba') {
-        if (tipoZona.value === 'facil') {
-          if (km <= 8) {
-            total = 0;
-            detalleTarifa = 'CABA zona fácil: hasta 8 km gratis.';
-          } else {
-            total = 5000 + ((km - 8) * 1500);
-            detalleTarifa = 'CABA zona fácil: después de 8 km, $5000 + $1500 por km.';
-          }
-        } else {
-          if (km <= 5) {
-            total = 0;
-            detalleTarifa = 'CABA zona difícil: hasta 5 km gratis.';
-          } else {
-            total = 8000 + ((km - 5) * 2000);
-            detalleTarifa = 'CABA zona difícil: después de 5 km, $8000 + $2000 por km.';
-          }
+      } else {
+        const baseCABA = 9000;
+        const tarifaKmCABA = 700;
+        precio = baseCABA + (distancia * tarifaKmCABA);
+        tipoViaje = 'Capital Federal';
+
+        detalle.push(`Base CABA: ${formatearPrecio(baseCABA)}`);
+        detalle.push(`Distancia: ${distancia} km × ${formatearPrecio(tarifaKmCABA)}`);
+
+        if (tipoZona.value === 'dificil') {
+          const recargoZona = 2500;
+          precio += recargoZona;
+          ajuste = `Recargo por zona complicada: ${formatearPrecio(recargoZona)}`;
+        }
+
+        if (rutaRapida.checked) {
+          const peajeCABA = 2200;
+          precio += peajeCABA;
+          ajuste += `${ajuste ? ' · ' : ''}Incluye ruta rápida / peaje: ${formatearPrecio(peajeCABA)}`;
         }
       }
 
-      // Agregar costo por peaje si está activado y total > 0
-      if (rutaRapida.checked && total > 0) {
-        total += 3000;
-        detalleTarifa += ' + $3000 por peajes (ruta rápida)';
-      }
+      resultadoPrecio.textContent = formatearPrecio(precio);
+      resultadoPrecio.className = 'price cobro';
 
-      const zonaTexto = region.value === 'caba'
-        ? (tipoZona.value === 'facil' ? 'Fácil' : 'Difícil')
-        : 'No aplica';
-
-      const precioClase = total === 0 ? 'gratis' : 'cobro';
-      const precioTexto = total === 0 ? 'Gratis' : formatearPesos(total);
-
-      resultado.innerHTML = `
-        <div class="price ${precioClase}">${precioTexto}</div>
-        <div class="meta">
-          <div><strong>Distancia:</strong> ${km} km</div>
-          <div><strong>Región:</strong> ${region.value === 'gba' ? 'Gran Buenos Aires' : 'Capital Federal'}</div>
-          <div><strong>Zona:</strong> ${zonaTexto}</div>
-          <div><strong>Ruta rápida:</strong> ${rutaRapida.checked ? 'Sí' : 'No'}</div>
-        </div>
-        <div class="pill">${detalleTarifa}</div>
+      resultadoMeta.innerHTML = `
+        <span><strong>Zona:</strong> ${tipoViaje}</span>
+        <span><strong>Cálculo:</strong> ${detalle.join(' + ')}</span>
+        ${ajuste ? `<span><strong>Ajustes:</strong> ${ajuste}</span>` : ''}
+        <span class="pill">Valor estimado final</span>
       `;
     }
 
-    region.addEventListener('change', toggleBarrios);
+    function borrarFormulario(){
+      distanciaInput.value = '';
+      regionSelect.value = 'gba';
+      tipoZona.value = 'dificil';
+      rutaRapida.checked = false;
+      actualizarRegion();
+      mostrarError(false);
+      resultadoPrecio.textContent = '—';
+      resultadoPrecio.className = 'price';
+      resultadoMeta.innerHTML = '<span>Ingresá una distancia para calcular.</span>';
+    }
+
+    regionSelect.addEventListener('change', actualizarRegion);
     btnCalcular.addEventListener('click', calcularFlete);
-    btnBorrar.addEventListener('click', reiniciar);
-    document.addEventListener('DOMContentLoaded', toggleBarrios);
+    btnBorrar.addEventListener('click', borrarFormulario);
+    distanciaInput.addEventListener('input', () => {
+      if (distanciaInput.value.trim() !== '') mostrarError(false);
+    });
+
+    actualizarRegion();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
   </script>
 </body>
 </html>
