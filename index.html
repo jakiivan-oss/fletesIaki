@@ -442,23 +442,30 @@
 
       mostrarError(false);
 
+      if (distancia <= 8) {
+        resultadoPrecio.textContent = '$0';
+        resultadoPrecio.className = 'price gratis';
+        resultadoMeta.innerHTML = '<span>Viajes hasta 8 km son gratuitos.</span>';
+        return;
+      }
+
+      const distanciaCobro = distancia - 8;
+
       let precio = 0;
       let detalle = [];
       let tipoViaje = '';
       let ajuste = '';
 
       if (regionSelect.value === 'gba') {
-        // Ajustado para que 13 km = $15.000
-        // Fórmula: base + km * tarifa
-        // 7000 + (13 * 615.38) = aprox 15000
+        // Ajustado para que 13 km = $15.000 con base + tarifa por km
         const baseGBA = 7000;
         const tarifaKmGBA = 615.38;
 
-        precio = baseGBA + (distancia * tarifaKmGBA);
+        precio = baseGBA + (distanciaCobro * tarifaKmGBA);
         tipoViaje = 'Gran Buenos Aires';
 
         detalle.push(`Base GBA: ${formatearPrecio(baseGBA)}`);
-        detalle.push(`Distancia: ${distancia} km × ${formatearPrecio(tarifaKmGBA)}`);
+        detalle.push(`Distancia cobrada: ${distanciaCobro.toFixed(1)} km × ${formatearPrecio(tarifaKmGBA)}`);
 
         if (rutaRapida.checked) {
           const peajeGBA = 1800;
@@ -468,11 +475,11 @@
       } else {
         const baseCABA = 9000;
         const tarifaKmCABA = 700;
-        precio = baseCABA + (distancia * tarifaKmCABA);
+        precio = baseCABA + (distanciaCobro * tarifaKmCABA);
         tipoViaje = 'Capital Federal';
 
         detalle.push(`Base CABA: ${formatearPrecio(baseCABA)}`);
-        detalle.push(`Distancia: ${distancia} km × ${formatearPrecio(tarifaKmCABA)}`);
+        detalle.push(`Distancia cobrada: ${distanciaCobro.toFixed(1)} km × ${formatearPrecio(tarifaKmCABA)}`);
 
         if (tipoZona.value === 'dificil') {
           const recargoZona = 2500;
