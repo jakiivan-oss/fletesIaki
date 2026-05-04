@@ -4,21 +4,21 @@ const urlsToCache = [
   'index.html',
   'manifest.json',
   'icon.png',
-  // otros archivos CSS/JS si los tienes
+  // agrega aquí otros archivos CSS/JS si los tienes
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(urlsToCache);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
   );
 });
 
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+      return response || fetch(event.request).catch(() => {
+        // Opcional: aquí podrías devolver una página offline si tienes
+      });
     })
   );
 });
@@ -37,4 +37,3 @@ self.addEventListener('activate', event => {
     )
   );
 });
-
