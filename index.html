@@ -390,14 +390,14 @@
       </div>
 
       <div class="actions">
-        <button type="button" class="btn-reset" id="btnBorrar">Borrar</button>
-        <button type="button" class="btn-main" id="btnCalcular">Calcular</button>
+        <button type="button" class="btn-reset" id="btn-reset">Limpiar</button>
+        <button type="button" class="btn-main" id="btn-calcular">Calcular</button>
       </div>
 
-      <section class="result" aria-live="polite" aria-atomic="true">
-        <h2 id="resultadoPrecio" class="price">—</h2>
-        <div class="meta" id="resultadoMeta">
-          <span>Ingresá una distancia para calcular.</span>
+      <section class="result" id="resultado" aria-live="polite">
+        <p class="price">—</p>
+        <div class="meta">
+          <span>Completá los datos para ver el valor del viaje.</span>
         </div>
       </section>
     </div>
@@ -406,129 +406,138 @@
   <script>
     const distanciaInput = document.getElementById('distancia');
     const regionSelect = document.getElementById('region');
+    const tipoZonaSelect = document.getElementById('tipo_zona');
     const campoBarrios = document.getElementById('campo-barrios');
-    const tipoZona = document.getElementById('tipo_zona');
-    const rutaRapida = document.getElementById('ruta_rapida');
-    const btnCalcular = document.getElementById('btnCalcular');
-    const btnBorrar = document.getElementById('btnBorrar');
+    const rutaRapidaInput = document.getElementById('ruta_rapida');
+    const btnCalcular = document.getElementById('btn-calcular');
+    const btnReset = document.getElementById('btn-reset');
+    const resultado = document.getElementById('resultado');
     const errorDistancia = document.getElementById('error-distancia');
-    const resultadoPrecio = document.getElementById('resultadoPrecio');
-    const resultadoMeta = document.getElementById('resultadoMeta');
 
-    function formatearPrecio(valor){
-      return '$' + Math.round(valor).toLocaleString('es-AR');
+    function formatearPesos(valor) {
+      return new Intl.NumberFormat('es-AR', {
+        style: 'currency',
+        currency: 'ARS',
+        maximumFractionDigits: 0
+      }).format(valor);
     }
 
-    function mostrarError(mostrar){
-      errorDistancia.style.display = mostrar ? 'block' : 'none';
-      distanciaInput.setAttribute('aria-invalid', mostrar ? 'true' : 'false');
-    }
-
-    function actualizarRegion(){
+    function actualizarRegion() {
       const esCaba = regionSelect.value === 'caba';
       campoBarrios.classList.toggle('hidden', !esCaba);
     }
 
-    function calcularFlete(){
+    function validarDistancia() {
       const distancia = parseFloat(distanciaInput.value);
+      const valida = !isNaN(distancia) && distancia >= 0;
+      errorDistancia.style.display = valida ? 'none' : 'block';
+      return valida;
+    }
 
-      if (isNaN(distancia) || distancia <= 0){
-        mostrarError(true);
-        resultadoPrecio.textContent = '—';
-        resultadoPrecio.className = 'price';
-        resultadoMeta.innerHTML = '<span>Ingresá una distancia válida para calcular.</span>';
-        return;
-      }
+    function calcularGBA(distancia, rutaRapida) {
+      let costo = 0;
+      const peaje = rutaRapida ? 2000 : 0;
 
-      mostrarError(false);
-
-      if (distancia <= 8) {
-        resultadoPrecio.textContent = '$0';
-        resultadoPrecio.className = 'price gratis';
-        resultadoMeta.innerHTML = '<span>Viajes hasta 8 km son gratuitos.</span>';
-        return;
-      }
-
-      const distanciaCobro = distancia - 8;
-
-      let precio = 0;
-      let detalle = [];
-      let tipoViaje = '';
-      let ajuste = '';
-
-      if (regionSelect.value === 'gba') {
-        // Ajustado para que 13 km = $15.000 con base + tarifa por km
-        const baseGBA = 7000;
-        const tarifaKmGBA = 615.38;
-
-        precio = baseGBA + (distanciaCobro * tarifaKmGBA);
-        tipoViaje = 'Gran Buenos Aires';
-
-        detalle.push(`Base GBA: ${formatearPrecio(baseGBA)}`);
-        detalle.push(`Distancia cobrada: ${distanciaCobro.toFixed(1)} km × ${formatearPrecio(tarifaKmGBA)}`);
-
-        if (rutaRapida.checked) {
-          const peajeGBA = 1800;
-          precio += peajeGBA;
-          ajuste = `Incluye ruta rápida / peaje: ${formatearPrecio(peajeGBA)}`;
-        }
+      if (distancia <= 10) {
+        costo = 0;
+      } else if (distancia <= 14) {
+        costo = 14000;
       } else {
-        const baseCABA = 9000;
-        const tarifaKmCABA = 700;
-        precio = baseCABA + (distanciaCobro * tarifaKmCABA);
-        tipoViaje = 'Capital Federal';
-
-        detalle.push(`Base CABA: ${formatearPrecio(baseCABA)}`);
-        detalle.push(`Distancia cobrada: ${distanciaCobro.toFixed(1)} km × ${formatearPrecio(tarifaKmCABA)}`);
-
-        if (tipoZona.value === 'dificil') {
-          const recargoZona = 2500;
-          precio += recargoZona;
-          ajuste = `Recargo por zona complicada: ${formatearPrecio(recargoZona)}`;
-        }
-
-        if (rutaRapida.checked) {
-          const peajeCABA = 2200;
-          precio += peajeCABA;
-          ajuste += `${ajuste ? ' · ' : ''}Incluye ruta rápida / peaje: ${formatearPrecio(peajeCABA)}`;
-        }
+        costo = 14000 + Math.ceil(distancia - 14) * 1000;
       }
 
-      resultadoPrecio.textContent = formatearPrecio(precio);
-      resultadoPrecio.className = 'price cobro';
+      return {
+        costoTotal: costo + peaje,
+        costoBase: costo,
+        peaje: peaje,
+        detalle: distancia <= 10
+          ? 'Viaje gratis hasta 10 km en GBA.'
+          : distancia <= 14
+            ? 'Se cobra tarifa mínima de 14 km.'
+            : 'Se cobra tarifa base de 14 km + $1000 por cada km adicional.'
+      };
+    }
 
-      resultadoMeta.innerHTML = `
-        <span><strong>Zona:</strong> ${tipoViaje}</span>
-        <span><strong>Cálculo:</strong> ${detalle.join(' + ')}</span>
-        ${ajuste ? `<span><strong>Ajustes:</strong> ${ajuste}</span>` : ''}
-        <span class="pill">Valor estimado final</span>
+    function calcularCABA(distancia, tipoZona, rutaRapida) {
+      let costo = 0;
+      const peaje = rutaRapida ? 2000 : 0;
+
+      if (tipoZona === 'dificil') {
+        costo = 18000 + Math.ceil(distancia) * 1200;
+      } else {
+        costo = 14000 + Math.ceil(distancia) * 1000;
+      }
+
+      return {
+        costoTotal: costo + peaje,
+        costoBase: costo,
+        peaje: peaje,
+        detalle: tipoZona === 'dificil'
+          ? 'Zona CABA de acceso complejo.'
+          : 'Zona CABA residencial o de acceso más simple.'
+      };
+    }
+
+    function renderResultado(data, distancia, region) {
+      const gratis = data.costoTotal === 0;
+
+      resultado.innerHTML = `
+        <p class="price ${gratis ? 'gratis' : 'cobro'}">${gratis ? 'GRATIS' : formatearPesos(data.costoTotal)}</p>
+        <div class="meta">
+          <span><strong>Distancia:</strong> ${distancia} km</span>
+          <span><strong>Región:</strong> ${region === 'gba' ? 'Gran Buenos Aires' : 'Capital Federal'}</span>
+          <span><strong>Tarifa base:</strong> ${formatearPesos(data.costoBase)}</span>
+          <span><strong>Peajes:</strong> ${data.peaje > 0 ? formatearPesos(data.peaje) : 'No aplica'}</span>
+          <span>${data.detalle}</span>
+        </div>
+        <span class="pill">${data.peaje > 0 ? 'Incluye ruta rápida' : 'Sin peajes'}</span>
       `;
     }
 
-    function borrarFormulario(){
+    function calcular() {
+      if (!validarDistancia()) return;
+
+      const distancia = parseFloat(distanciaInput.value);
+      const region = regionSelect.value;
+      const rutaRapida = rutaRapidaInput.checked;
+
+      let resultadoCalculo;
+
+      if (region === 'gba') {
+        resultadoCalculo = calcularGBA(distancia, rutaRapida);
+      } else {
+        resultadoCalculo = calcularCABA(distancia, tipoZonaSelect.value, rutaRapida);
+      }
+
+      renderResultado(resultadoCalculo, distancia, region);
+    }
+
+    function limpiar() {
       distanciaInput.value = '';
       regionSelect.value = 'gba';
-      tipoZona.value = 'dificil';
-      rutaRapida.checked = false;
+      tipoZonaSelect.value = 'dificil';
+      rutaRapidaInput.checked = false;
+      errorDistancia.style.display = 'none';
       actualizarRegion();
-      mostrarError(false);
-      resultadoPrecio.textContent = '—';
-      resultadoPrecio.className = 'price';
-      resultadoMeta.innerHTML = '<span>Ingresá una distancia para calcular.</span>';
+      resultado.innerHTML = `
+        <p class="price">—</p>
+        <div class="meta">
+          <span>Completá los datos para ver el valor del viaje.</span>
+        </div>
+      `;
     }
 
     regionSelect.addEventListener('change', actualizarRegion);
-    btnCalcular.addEventListener('click', calcularFlete);
-    btnBorrar.addEventListener('click', borrarFormulario);
-    distanciaInput.addEventListener('input', () => {
-      if (distanciaInput.value.trim() !== '') mostrarError(false);
-    });
+    btnCalcular.addEventListener('click', calcular);
+    btnReset.addEventListener('click', limpiar);
+    distanciaInput.addEventListener('input', validarDistancia);
 
     actualizarRegion();
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').catch(() => {});
+        navigator.serviceWorker.register('service-worker.js')
+          .catch(err => console.error('Error al registrar el service worker:', err));
       });
     }
   </script>
