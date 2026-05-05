@@ -1,21 +1,19 @@
 {
-  "name": "Fletes Iaki - Calculadora",
+  "name": "Fletes Iaki",
   "short_name": "Fletes Iaki",
   "start_url": ".",
-  "scope": ".",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#171717",
   "theme_color": "#FF6600",
   "description": "Calculadora de fletes para Fletes Iaki",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
