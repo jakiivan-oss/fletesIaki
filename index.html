@@ -441,9 +441,11 @@
       if (distancia <= 10) {
         costo = 0;
       } else if (distancia <= 14) {
-        costo = 14000;
+        // Cobrar 14,000 $ + 1,000 $ por cada km sobre 10 km
+        costo = 14000 + Math.ceil(distancia - 10) * 1000;
       } else {
-        costo = 14000 + Math.ceil(distancia - 14) * 1000;
+        // A partir de 14 km, cobrar 14,000 $ + 4,000 $ (por los 4 km entre 10 y 14) + 1,000 $ por cada km extra sobre 14 km
+        costo = 14000 + (4 * 1000) + Math.ceil(distancia - 14) * 1000;
       }
 
       return {
@@ -453,8 +455,8 @@
         detalle: distancia <= 10
           ? 'Viaje gratis hasta 10 km en GBA.'
           : distancia <= 14
-            ? 'Se cobra tarifa mínima de 14 km.'
-            : 'Se cobra tarifa base de 14 km + $1000 por cada km adicional.'
+            ? 'Se cobra tarifa base de 14,000 $ más $1,000 por km entre 10 y 14 km.'
+            : 'Se cobra tarifa base de 14,000 $ más $1,000 por km entre 10 y 14 km y $1,000 por km adicional sobre 14 km.'
       };
     }
 
