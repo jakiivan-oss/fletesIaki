@@ -6,542 +6,232 @@
   <title>Fletes Iaki - Calculadora</title>
   <meta name="theme-color" content="#111111" />
   <meta name="description" content="Calculadora de fletes para Fletes Iaki" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="icon.png" />
-
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
-
   <style>
-    :root{
-      --bg:#111111;
-      --panel:#f7f4ee;
-      --text:#181818;
-      --muted:#5d5d5d;
-      --line:rgba(0,0,0,.12);
-      --accent:#ff6a00;
-      --accent-2:#ff8e3c;
-      --ok:#0f9d58;
-      --danger:#c62828;
-      --shadow:0 20px 60px rgba(0,0,0,.28);
+    body {
+      font-family: Arial, sans-serif;
+      background: #171717;
+      color: #eee;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
     }
-
-    *{box-sizing:border-box}
-
-    html,body{
-      margin:0;
-      min-height:100%;
+    main {
+      background: #fff;
+      color: #222;
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
     }
-
-    body{
-      font-family:"Manrope", sans-serif;
-      color:var(--text);
-      background:
-        radial-gradient(circle at top left, rgba(255,106,0,.12), transparent 25%),
-        radial-gradient(circle at bottom right, rgba(255,255,255,.04), transparent 20%),
-        var(--bg);
-      min-height:100vh;
-      min-height:100dvh;
-      padding:18px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+      font-weight: 900;
+      font-size: 1.5rem;
     }
-
-    .app{
-      width:min(100%, 560px);
-      min-height:calc(100vh - 36px);
-      min-height:calc(100dvh - 36px);
-      background:var(--panel);
-      border-radius:clamp(24px, 4vw, 34px);
-      box-shadow:var(--shadow);
-      padding:clamp(22px, 4vw, 34px);
-      position:relative;
-      overflow:hidden;
-      animation:reveal .8s ease both;
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #222;
     }
-
-    .app::before{
-      content:"";
-      position:absolute;
-      inset:auto -10% -18% auto;
-      width:260px;
-      height:260px;
-      background:radial-gradient(circle, rgba(255,106,0,.15), transparent 65%);
-      pointer-events:none;
+    input[type="number"],
+    select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
     }
-
-    .eyebrow{
-      font-size:.82rem;
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      font-weight:800;
-      color:var(--accent);
-      margin:0 0 10px;
-      animation:slideUp .6s ease both;
-      animation-delay:.05s;
+    .error-msg {
+      color: #b3261e;
+      font-weight: 700;
+      margin-top: 4px;
+      display: none;
     }
-
-    h1{
-      margin:0;
-      font-family:"Archivo Black", sans-serif;
-      font-size:clamp(2.2rem, 8vw, 3.4rem);
-      line-height:.95;
-      letter-spacing:-.03em;
-      text-transform:uppercase;
-      animation:slideUp .6s ease both;
-      animation-delay:.12s;
+    .toggle-container {
+      margin-top: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #222;
     }
-
-    .brand{
-      margin:18px 0 4px;
-      font-size:clamp(1.4rem, 4vw, 2rem);
-      font-weight:500;
-      animation:slideUp .6s ease both;
-      animation-delay:.18s;
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      font-weight: 900;
+      font-size: 1rem;
+      cursor: pointer;
+      background-color: #ff6600;
+      color: white;
+      width: 48%;
     }
-
-    .base{
-      margin:0 0 26px;
-      color:var(--muted);
-      font-size:clamp(1rem, 2.8vw, 1.15rem);
-      animation:slideUp .6s ease both;
-      animation-delay:.24s;
+    button.btn-reset {
+      background-color: #ccc;
+      color: #333;
     }
-
-    .form-grid{
-      display:grid;
-      gap:18px;
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
     }
-
-    .field,
-    .route,
-    .actions,
-    .result{
-      animation:slideUp .6s ease both;
+    #resultado {
+      margin-top: 20px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #222;
+      min-height: 50px;
     }
-
-    .field:nth-child(1){animation-delay:.28s}
-    .field:nth-child(2){animation-delay:.34s}
-    .field:nth-child(3){animation-delay:.4s}
-    .route{animation-delay:.46s}
-    .actions{animation-delay:.52s}
-    .result{animation-delay:.58s}
-
-    label{
-      display:block;
-      margin:0 0 10px;
-      font-size:1rem;
-      font-weight:800;
-      letter-spacing:-.02em;
+    /* Logo container */
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
     }
-
-    .input,
-    .select{
-      width:100%;
-      border:1.5px solid var(--line);
-      background:#fff;
-      color:var(--text);
-      border-radius:20px;
-      padding:18px 18px;
-      font-size:1.1rem;
-      font-family:"Manrope", sans-serif;
-      outline:none;
-      transition:.2s ease;
-      appearance:none;
-      -webkit-appearance:none;
-    }
-
-    .select{
-      background-image:
-        linear-gradient(45deg, transparent 50%, #444 50%),
-        linear-gradient(135deg, #444 50%, transparent 50%);
-      background-position:
-        calc(100% - 24px) calc(50% - 3px),
-        calc(100% - 18px) calc(50% - 3px);
-      background-size:6px 6px, 6px 6px;
-      background-repeat:no-repeat;
-      padding-right:46px;
-    }
-
-    .input:focus,
-    .select:focus{
-      border-color:rgba(255,106,0,.7);
-      box-shadow:0 0 0 4px rgba(255,106,0,.12);
-      transform:translateY(-1px);
-    }
-
-    .hidden{display:none}
-
-    .error-msg{
-      display:none;
-      margin-top:8px;
-      color:var(--danger);
-      font-size:.95rem;
-      font-weight:700;
-    }
-
-    .route{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-      padding:14px 16px;
-      border-radius:20px;
-      background:linear-gradient(180deg, rgba(255,255,255,.65), rgba(0,0,0,.02));
-      border:1px solid var(--line);
-    }
-
-    .route span{
-      font-size:1rem;
-      font-weight:800;
-      letter-spacing:-.02em;
-    }
-
-    .switch{
-      position:relative;
-      width:58px;
-      height:34px;
-      flex:0 0 auto;
-    }
-
-    .switch input{
-      opacity:0;
-      width:0;
-      height:0;
-      position:absolute;
-    }
-
-    .slider{
-      position:absolute;
-      inset:0;
-      background:#d4d0c9;
-      border-radius:999px;
-      transition:.25s ease;
-      cursor:pointer;
-    }
-
-    .slider::before{
-      content:"";
-      position:absolute;
-      width:26px;
-      height:26px;
-      left:4px;
-      top:4px;
-      background:#fff;
-      border-radius:50%;
-      transition:.25s ease;
-      box-shadow:0 4px 10px rgba(0,0,0,.18);
-    }
-
-    .switch input:checked + .slider{
-      background:linear-gradient(90deg, var(--accent), var(--accent-2));
-    }
-
-    .switch input:checked + .slider::before{
-      transform:translateX(24px);
-    }
-
-    .actions{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:14px;
-    }
-
-    button{
-      border:none;
-      border-radius:20px;
-      padding:18px 14px;
-      font-family:"Manrope", sans-serif;
-      font-size:1.05rem;
-      font-weight:900;
-      cursor:pointer;
-      transition:transform .16s ease, filter .16s ease, box-shadow .16s ease;
-    }
-
-    button:hover{transform:translateY(-2px)}
-    button:active{transform:translateY(0) scale(.98)}
-
-    .btn-reset{
-      background:#d4d4d4;
-      color:#222;
-    }
-
-    .btn-main{
-      color:#fff;
-      background:linear-gradient(135deg, var(--accent), #ff7d12 60%, #ff9f57);
-      box-shadow:0 12px 28px rgba(255,106,0,.28);
-    }
-
-    .result{
-      min-height:104px;
-      border-top:1px solid rgba(0,0,0,.08);
-      padding-top:18px;
-    }
-
-    .price{
-      font-family:"Archivo Black", sans-serif;
-      font-size:clamp(2rem, 7vw, 3rem);
-      line-height:1;
-      letter-spacing:-.04em;
-      margin:0 0 10px;
-    }
-
-    .gratis{color:var(--ok)}
-    .cobro{color:var(--accent)}
-
-    .meta{
-      display:grid;
-      gap:4px;
-      color:#333;
-      font-size:1rem;
-    }
-
-    .pill{
-      display:inline-block;
-      margin-top:10px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:#fff;
-      border:1px solid var(--line);
-      color:var(--muted);
-      font-size:.9rem;
-      font-weight:700;
-    }
-
-    @keyframes reveal{
-      from{opacity:0; transform:translateY(14px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-
-    @keyframes slideUp{
-      from{opacity:0; transform:translateY(16px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-
-    @media (max-width:520px){
-      body{padding:0}
-      .app{
-        width:100%;
-        min-height:100vh;
-        min-height:100dvh;
-        border-radius:0;
-        padding:22px 18px 28px;
-      }
+    .logo-container img {
+      max-width: 250px;
+      height: auto;
     }
   </style>
 </head>
 <body>
-  <main class="app" role="main" aria-label="Calculadora de fletes">
-    <p class="eyebrow">Fletes Iaki</p>
-    <h1>Calculadora</h1>
-    <p class="brand">FLETES IAKI</p>
-    <p class="base">📍 Base: Int. Manuel Quindimil 741, Lanús</p>
-
-    <div class="form-grid">
-      <div class="field">
-        <label for="distancia">Distancia (km)</label>
-        <input
-          class="input"
-          type="number"
-          id="distancia"
-          name="distancia"
-          placeholder="Ej: 13"
-          min="0"
-          step="0.1"
-          inputmode="decimal"
-          aria-describedby="error-distancia"
-        />
-        <div id="error-distancia" class="error-msg">Ingresá una distancia válida.</div>
-      </div>
-
-      <div class="field">
-        <label for="region">Región</label>
-        <select class="select" id="region" name="region">
-          <option value="gba">Gran Buenos Aires (GBA)</option>
-          <option value="caba">Capital Federal (CABA)</option>
-        </select>
-      </div>
-
-      <div class="field hidden" id="campo-barrios">
-        <label for="tipo_zona">Barrio CABA</label>
-        <select class="select" id="tipo_zona" name="tipo_zona">
-          <option value="dificil">Microcentro / Once / Congreso</option>
-          <option value="dificil">San Telmo / Retiro / Recoleta</option>
-          <option value="dificil">Palermo / Belgrano / V. Crespo</option>
-          <option value="dificil">Caballito / Almagro / Flores</option>
-          <option value="dificil">Puerto Madero / Ciclovías</option>
-          <option value="facil">V. Devoto / Liniers / Mataderos</option>
-          <option value="facil">Saavedra / Urquiza / Coghlan</option>
-          <option value="facil">P. Patricios / Pompeya / Barracas</option>
-          <option value="facil">V. Lugano / Soldati / Riachuelo</option>
-          <option value="facil">M. Castro / Versalles / Floresta</option>
-          <option value="facil">Otros barrios residenciales</option>
-        </select>
-      </div>
-
-      <div class="route">
-        <span>🚚 Ruta rápida (peaje)</span>
-        <label class="switch" aria-label="Activar ruta rápida">
-          <input type="checkbox" id="ruta_rapida" />
-          <span class="slider"></span>
-        </label>
-      </div>
-
-      <div class="actions">
-        <button type="button" class="btn-reset" id="btn-reset">Limpiar</button>
-        <button type="button" class="btn-main" id="btn-calcular">Calcular</button>
-      </div>
-
-      <section class="result" id="resultado" aria-live="polite">
-        <p class="price">—</p>
-        <div class="meta">
-          <span>Completá los datos para ver el valor del viaje.</span>
-        </div>
-      </section>
+  <main>
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo Fletes Iaki" />
     </div>
+    <h2>Calculadora Fletes Iaki</h2>
+    <form id="formulario">
+      <label for="distancia">Distancia (km):</label>
+      <input type="number" id="distancia" name="distancia" min="0" step="0.1" required />
+      <div id="error-distancia" class="error-msg">Por favor ingresa una distancia válida.</div>
+
+      <label for="region">Región:</label>
+      <select id="region" name="region" required>
+        <option value="gba">Gran Buenos Aires (GBA)</option>
+        <option value="caba">Capital Federal (CABA)</option>
+      </select>
+
+      <div id="zona-caba-container" style="display:none;">
+        <label for="zona-caba">Zona en CABA:</label>
+        <select id="zona-caba" name="zona-caba">
+          <optgroup label="Zonas complicadas">
+            <option value="Microcentro / Once / Congreso">Microcentro / Once / Congreso</option>
+            <option value="San Telmo / Retiro / Recoleta">San Telmo / Retiro / Recoleta</option>
+            <option value="Palermo / Belgrano / Villa Crespo">Palermo / Belgrano / Villa Crespo</option>
+            <option value="Caballito / Almagro / Flores">Caballito / Almagro / Flores</option>
+            <option value="Puerto Madero / Ciclovías">Puerto Madero / Ciclovías</option>
+          </optgroup>
+          <optgroup label="Zonas no complicadas">
+            <option value="Villa Devoto / Liniers / Mataderos">Villa Devoto / Liniers / Mataderos</option>
+            <option value="Villa Lugano / Villa Soldati / Villa Riachuelo">Villa Lugano / Villa Soldati / Villa Riachuelo</option>
+            <option value="Parque Avellaneda / Villa Luro">Parque Avellaneda / Villa Luro</option>
+            <option value="Floresta / Vélez Sarsfield">Floresta / Vélez Sarsfield</option>
+            <option value="Villa Urquiza / Coghlan / Saavedra">Villa Urquiza / Coghlan / Saavedra</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="toggle-container">
+        <input type="checkbox" id="ruta-rapida" name="ruta-rapida" />
+        <label for="ruta-rapida">Ruta rápida (Peaje)</label>
+      </div>
+
+      <div class="btn-group">
+        <button type="button" class="btn-reset" id="btn-reset">Limpiar</button>
+        <button type="submit">Calcular</button>
+      </div>
+    </form>
+
+    <div id="resultado" aria-live="polite"></div>
   </main>
 
   <script>
+    const form = document.getElementById('formulario');
     const distanciaInput = document.getElementById('distancia');
     const regionSelect = document.getElementById('region');
-    const tipoZonaSelect = document.getElementById('tipo_zona');
-    const campoBarrios = document.getElementById('campo-barrios');
-    const rutaRapidaInput = document.getElementById('ruta_rapida');
-    const btnCalcular = document.getElementById('btn-calcular');
+    const zonaCabaContainer = document.getElementById('zona-caba-container');
+    const zonaCabaSelect = document.getElementById('zona-caba');
+    const rutaRapidaCheckbox = document.getElementById('ruta-rapida');
+    const resultadoDiv = document.getElementById('resultado');
+    const errorDistanciaDiv = document.getElementById('error-distancia');
     const btnReset = document.getElementById('btn-reset');
-    const resultado = document.getElementById('resultado');
-    const errorDistancia = document.getElementById('error-distancia');
 
-    function formatearPesos(valor) {
-      return new Intl.NumberFormat('es-AR', {
-        style: 'currency',
-        currency: 'ARS',
-        maximumFractionDigits: 0
-      }).format(valor);
-    }
+    const PEAJE_EXTRA = 1500;
 
-    function actualizarRegion() {
-      const esCaba = regionSelect.value === 'caba';
-      campoBarrios.classList.toggle('hidden', !esCaba);
-    }
+    const zonasComplicadas = [
+      "Microcentro / Once / Congreso",
+      "San Telmo / Retiro / Recoleta",
+      "Palermo / Belgrano / Villa Crespo",
+      "Caballito / Almagro / Flores",
+      "Puerto Madero / Ciclovías"
+    ];
 
-    function validarDistancia() {
-      const distancia = parseFloat(distanciaInput.value);
-      const valida = !isNaN(distancia) && distancia >= 0;
-      errorDistancia.style.display = valida ? 'none' : 'block';
-      return valida;
-    }
-
-    function calcularGBA(distancia, rutaRapida) {
-      let costo = 0;
-      const peaje = rutaRapida ? 2000 : 0;
-
-      if (distancia <= 10) {
-        costo = 0;
-      } else if (distancia <= 14) {
-        // Cobrar 14,000 $ + 1,000 $ por cada km sobre 10 km
-        costo = 14000 + Math.ceil(distancia - 10) * 1000;
+    regionSelect.addEventListener('change', () => {
+      if (regionSelect.value === 'caba') {
+        zonaCabaContainer.style.display = 'block';
       } else {
-        // A partir de 14 km, cobrar 14,000 $ + 4,000 $ (por los 4 km entre 10 y 14) + 1,000 $ por cada km extra sobre 14 km
-        costo = 14000 + (4 * 1000) + Math.ceil(distancia - 14) * 1000;
+        zonaCabaContainer.style.display = 'none';
       }
+      resultadoDiv.textContent = '';
+      errorDistanciaDiv.style.display = 'none';
+    });
 
-      return {
-        costoTotal: costo + peaje,
-        costoBase: costo,
-        peaje: peaje,
-        detalle: distancia <= 10
-          ? 'Viaje gratis hasta 10 km en GBA.'
-          : distancia <= 14
-            ? 'Se cobra tarifa base de 14,000 $ más $1,000 por km entre 10 y 14 km.'
-            : 'Se cobra tarifa base de 14,000 $ más $1,000 por km entre 10 y 14 km y $1,000 por km adicional sobre 14 km.'
-      };
-    }
+    btnReset.addEventListener('click', () => {
+      form.reset();
+      zonaCabaContainer.style.display = 'none';
+      resultadoDiv.textContent = '';
+      errorDistanciaDiv.style.display = 'none';
+    });
 
-    function calcularCABA(distancia, tipoZona, rutaRapida) {
-      let costo = 0;
-      const peaje = rutaRapida ? 2000 : 0;
-
-      if (tipoZona === 'dificil') {
-        costo = 18000 + Math.ceil(distancia) * 1200;
-      } else {
-        costo = 14000 + Math.ceil(distancia) * 1000;
-      }
-
-      return {
-        costoTotal: costo + peaje,
-        costoBase: costo,
-        peaje: peaje,
-        detalle: tipoZona === 'dificil'
-          ? 'Zona CABA de acceso complejo.'
-          : 'Zona CABA residencial o de acceso más simple.'
-      };
-    }
-
-    function renderResultado(data, distancia, region) {
-      const gratis = data.costoTotal === 0;
-
-      resultado.innerHTML = `
-        <p class="price ${gratis ? 'gratis' : 'cobro'}">${gratis ? 'GRATIS' : formatearPesos(data.costoTotal)}</p>
-        <div class="meta">
-          <span><strong>Distancia:</strong> ${distancia} km</span>
-          <span><strong>Región:</strong> ${region === 'gba' ? 'Gran Buenos Aires' : 'Capital Federal'}</span>
-          <span><strong>Tarifa base:</strong> ${formatearPesos(data.costoBase)}</span>
-          <span><strong>Peajes:</strong> ${data.peaje > 0 ? formatearPesos(data.peaje) : 'No aplica'}</span>
-          <span>${data.detalle}</span>
-        </div>
-        <span class="pill">${data.peaje > 0 ? 'Incluye ruta rápida' : 'Sin peajes'}</span>
-      `;
-    }
-
-    function calcular() {
-      if (!validarDistancia()) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
 
       const distancia = parseFloat(distanciaInput.value);
+      if (isNaN(distancia) || distancia < 0) {
+        errorDistanciaDiv.style.display = 'block';
+        resultadoDiv.textContent = '';
+        return;
+      } else {
+        errorDistanciaDiv.style.display = 'none';
+      }
+
       const region = regionSelect.value;
-      const rutaRapida = rutaRapidaInput.checked;
+      const rutaRapida = rutaRapidaCheckbox.checked;
 
-      let resultadoCalculo;
+      let precio = 0;
+      let detalle = '';
 
-      if (region === 'gba') {
-        resultadoCalculo = calcularGBA(distancia, rutaRapida);
+      if (region === 'caba') {
+        const barrio = zonaCabaSelect.value;
+        const esDificil = zonasComplicadas.includes(barrio);
+        const valorKm = esDificil ? 1100 : 1000;
+        precio = distancia * valorKm;
+        detalle = `Región: CABA, Zona: ${esDificil ? 'Complicada' : 'No complicada'}`;
       } else {
-        resultadoCalculo = calcularCABA(distancia, tipoZonaSelect.value, rutaRapida);
+        if (distancia <= 8) {
+          precio = 0;
+          detalle = 'Región: Gran Buenos Aires (GBA) - hasta 8 km gratis';
+        } else {
+          precio = distancia * 1000;
+          detalle = `Región: Gran Buenos Aires (GBA) - cobro total por ${distancia.toFixed(1).replace('.', ',')} km`;
+        }
       }
 
-      renderResultado(resultadoCalculo, distancia, region);
-    }
+      if (rutaRapida) {
+        precio += PEAJE_EXTRA;
+        detalle += ', Ruta rápida (Peaje) incluida';
+      } else {
+        detalle += ', Sin ruta rápida (Peaje)';
+      }
 
-    function limpiar() {
-      distanciaInput.value = '';
-      regionSelect.value = 'gba';
-      tipoZonaSelect.value = 'dificil';
-      rutaRapidaInput.checked = false;
-      errorDistancia.style.display = 'none';
-      actualizarRegion();
-      resultado.innerHTML = `
-        <p class="price">—</p>
-        <div class="meta">
-          <span>Completá los datos para ver el valor del viaje.</span>
-        </div>
-      `;
-    }
-
-    regionSelect.addEventListener('change', actualizarRegion);
-    btnCalcular.addEventListener('click', calcular);
-    btnReset.addEventListener('click', limpiar);
-    distanciaInput.addEventListener('input', validarDistancia);
-
-    actualizarRegion();
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-          .catch(err => console.error('Error al registrar el service worker:', err));
-      });
-    }
+      resultadoDiv.textContent = precio === 0 ? 'Gratis' : `Precio estimado: $${precio.toLocaleString('es-AR')} (${detalle})`;
+    });
   </script>
 </body>
 </html>
