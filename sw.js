@@ -4,7 +4,7 @@ const urlsToCache = [
   'index.html',
   'manifest.json',
   'icon.png',
-  // agrega aquí otros archivos CSS/JS si los tienes
+  'logo.png'
 ];
 
 self.addEventListener('install', event => {
@@ -17,7 +17,7 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request).then(response => {
       return response || fetch(event.request).catch(() => {
-        // Opcional: aquí podrías devolver una página offline si tienes
+        // Puedes devolver una página offline aquí si quieres
       });
     })
   );
